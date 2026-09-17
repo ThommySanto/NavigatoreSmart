@@ -5,19 +5,49 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-list>
+
+  <ion-segment [(ngModel)]="mode">
+    <ion-segment-button value="database">
+      <ion-label>Scegli modello</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="custom">
+      <ion-label>Personalizzato</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-list *ngIf="mode === 'database'" class="ion-margin-top">
+    <ion-item>
+      <ion-label>Categoria</ion-label>
+      <ion-select [(ngModel)]="selectedCategory" (ionChange)="onCategoryChange()" interface="action-sheet">
+        <ion-select-option *ngFor="let c of categories" [value]="c">{{ c }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Modello</ion-label>
+      <ion-select [(ngModel)]="selectedVehicleId" interface="action-sheet">
+        <ion-select-option *ngFor="let m of modelsInCategory" [value]="m.id">
+          {{ m.name }} ({{ m.fuelType }})
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="mode === 'custom'" class="ion-margin-top">
     <ion-item>
       <ion-label>Tipo di carburante</ion-label>
-      <ion-select [(ngModel)]="selectedFuel" interface="action-sheet">
-        <ion-select-option *ngFor="let f of fuelTypes" [value]="f.value">
-          {{ f.label }}
-        </ion-select-option>
+      <ion-select [(ngModel)]="customFuel" interface="action-sheet">
+        <ion-select-option value="benzina">Benzina</ion-select-option>
+        <ion-select-option value="diesel">Diesel</ion-select-option>
+        <ion-select-option value="metano">Metano</ion-select-option>
+        <ion-select-option value="gpl">GPL</ion-select-option>
+        <ion-select-option value="ibrido">Ibrido</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
       <ion-label position="stacked">Consumo medio (km per litro/kg)</ion-label>
-      <ion-input type="number" [(ngModel)]="avgConsumption"></ion-input>
+      <ion-input type="number" [(ngModel)]="customConsumption"></ion-input>
     </ion-item>
   </ion-list>
 

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-
-export type FuelType = 'benzina' | 'diesel' | 'metano' | 'gpl' | 'ibrido';
+import { FuelType, getModelById } from '../data/vehicle-database';
 
 export interface VehicleProfile {
+  vehicleId?: string;      // se selezionato dal database
   fuelType: FuelType;
-  avgConsumptionKmL: number; // km percorsi con 1 litro (o kg per metano)
+  avgConsumptionKmL: number;
+  label: string;           // nome mostrato all'utente
 }
 
 const STORAGE_KEY = 'ecoroute_vehicle_profile';
@@ -17,7 +18,24 @@ export class VehicleService {
     return raw ? JSON.parse(raw) : null;
   }
 
-  saveProfile(profile: VehicleProfile): void {
+  saveProfileFromDatabase(vehicleId: string): void {
+    const model = getModelById(vehicleId);
+    if (!model) return;
+    const profile: VehicleProfile = {
+      vehicleId: model.id,
+      fuelType: model.fuelType,
+      avgConsumptionKmL: model.avgConsumptionKmL,
+      label: model.name,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+  }
+
+  saveCustomProfile(fuelType: FuelType, avgConsumptionKmL: number): void {
+    const profile: VehicleProfile = {
+      fuelType,
+      avgConsumptionKmL,
+      label: 'Veicolo personalizzato',
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   }
 
