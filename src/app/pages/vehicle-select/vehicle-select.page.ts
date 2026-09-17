@@ -1,14 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import {
+  IonHeader, IonToolbar, IonTitle, IonContent,
+  IonList, IonItem, IonLabel, IonSelect, IonSelectOption,
+  IonInput, IonButton
+} from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { VehicleService, FuelType } from '../../services/vehicle.service';
 
 @Component({
   selector: 'app-vehicle-select',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [
+    CommonModule, FormsModule,
+    IonHeader, IonToolbar, IonTitle, IonContent,
+    IonList, IonItem, IonLabel, IonSelect, IonSelectOption,
+    IonInput, IonButton
+  ],
   templateUrl: './vehicle-select.page.html',
 })
 export class VehicleSelectPage implements OnInit {

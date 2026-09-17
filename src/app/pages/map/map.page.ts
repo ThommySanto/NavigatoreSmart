@@ -1,6 +1,9 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import {
+  IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
+  IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent
+} from '@ionic/angular/standalone';
 import * as L from 'leaflet';
 import { VehicleService } from '../../services/vehicle.service';
 
@@ -15,7 +18,11 @@ L.Icon.Default.mergeOptions({
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, IonicModule],
+  imports: [
+    CommonModule,
+    IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
+    IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent
+  ],
   templateUrl: './map.page.html',
 })
 export class MapPage implements AfterViewInit {
