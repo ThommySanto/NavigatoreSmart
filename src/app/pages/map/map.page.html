@@ -7,8 +7,8 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div id="map" style="width: 100%; height: 70%;"></div>
+<ion-content [fullscreen]="true">
+  <div id="map"></div>
 
   <ion-card *ngIf="distanceKm">
     <ion-card-header>
@@ -29,3 +29,11 @@
     Tocca la mappa per impostare partenza e arrivo.
   </p>
 </ion-content>
+
+<style>
+  #map {
+    width: 100%;
+    height: 400px;
+    z-index: 0;
+  }
+</style>

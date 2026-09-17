@@ -42,22 +42,26 @@ export class MapPage implements AfterViewInit {
   }
 
   private initMap() {
-    this.map = L.map('map').setView([43.7167, 13.2167], 13); // default: zona Marche
+  this.map = L.map('map').setView([43.7167, 13.2167], 13);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(this.map);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(this.map);
 
-    this.map.on('click', (e: L.LeafletMouseEvent) => this.onMapClick(e));
+  this.map.on('click', (e: L.LeafletMouseEvent) => this.onMapClick(e));
 
-    // Prova a centrare sulla posizione corrente
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((pos) => {
-        this.map.setView([pos.coords.latitude, pos.coords.longitude], 14);
-      });
-    }
+  setTimeout(() => {
+    this.map.invalidateSize();
+  }, 300);
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      this.map.setView([pos.coords.latitude, pos.coords.longitude], 14);
+      setTimeout(() => this.map.invalidateSize(), 100);
+    });
   }
+}
 
   private onMapClick(e: L.LeafletMouseEvent) {
     if (!this.startPoint) {
