@@ -33,20 +33,13 @@ jobs:
       - name: Add iOS platform (fresh, from scratch)
         run: npx cap add ios
 
-      - name: Debug - list ios/App contents
-        run: ls -la ios/App || echo "ios/App NON esiste"
-
       - name: Sync Capacitor (copy web build into iOS project)
         run: npx cap sync ios
 
-      - name: Install CocoaPods dependencies
-        working-directory: ios/App
-        run: pod install
-
-      - name: Build unsigned .app (Release, simulator-independent)
+      - name: Build unsigned .app (Release, using Xcode project - SPM, no CocoaPods)
         working-directory: ios/App
         run: |
-          xcodebuild -workspace App.xcworkspace \
+          xcodebuild -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
