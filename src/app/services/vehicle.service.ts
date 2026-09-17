@@ -6,6 +6,9 @@ export interface VehicleProfile {
   fuelType: FuelType;
   avgConsumptionKmL: number;
   label: string;           // nome mostrato all'utente
+  massKg?: number;
+  drivetrainEfficiency?: number;
+  fuelEnergyKWhPerUnit?: number;
 }
 
 const STORAGE_KEY = 'ecoroute_vehicle_profile';
@@ -26,6 +29,9 @@ export class VehicleService {
       fuelType: model.fuelType,
       avgConsumptionKmL: model.avgConsumptionKmL,
       label: model.name,
+      massKg: model.massKg,
+      drivetrainEfficiency: model.drivetrainEfficiency,
+      fuelEnergyKWhPerUnit: model.fuelEnergyKWhPerUnit,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   }

@@ -8,6 +8,36 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <div class="search-panel ion-padding">
+    <ion-item lines="full">
+      <ion-label position="stacked">Partenza</ion-label>
+      <ion-input [(ngModel)]="startQuery" placeholder="Via, numero civico, localita" autocomplete="street-address"
+        (ionInput)="onPlaceInput($event, 'start')" (keydown)="onSearchKeydown($event, 'start')"
+        aria-label="Cerca indirizzo di partenza"></ion-input>
+    </ion-item>
+    <ion-list class="suggestions" *ngIf="startSuggestions.length">
+      <ion-item button *ngFor="let place of startSuggestions; let i = index"
+        [class.active-suggestion]="i === activeStartSuggestion" (click)="selectSuggestion(place, 'start')">
+        <ion-label>{{ place.display_name }}</ion-label>
+      </ion-item>
+    </ion-list>
+    <div class="search-message" *ngIf="startSearchMessage">{{ startSearchMessage }}</div>
+
+    <ion-item lines="full">
+      <ion-label position="stacked">Arrivo</ion-label>
+      <ion-input [(ngModel)]="endQuery" placeholder="Via, numero civico, localita" autocomplete="street-address"
+        (ionInput)="onPlaceInput($event, 'end')" (keydown)="onSearchKeydown($event, 'end')"
+        aria-label="Cerca indirizzo di arrivo"></ion-input>
+    </ion-item>
+    <ion-list class="suggestions" *ngIf="endSuggestions.length">
+      <ion-item button *ngFor="let place of endSuggestions; let i = index"
+        [class.active-suggestion]="i === activeEndSuggestion" (click)="selectSuggestion(place, 'end')">
+        <ion-label>{{ place.display_name }}</ion-label>
+      </ion-item>
+    </ion-list>
+    <div class="search-message" *ngIf="endSearchMessage">{{ endSearchMessage }}</div>
+  </div>
+
   <div id="map"></div>
 
   <div class="ion-padding-horizontal ion-padding-top">
@@ -19,33 +49,84 @@
     <p>Calcolo percorsi e dislivelli...</p>
   </div>
 
-  <ion-card *ngFor="let option of routeOptions; let i = index"
-            [color]="i === selectedIndex ? 'success' : undefined"
-            (click)="selectRoute(i)"
-            button="true">
+  <ion-card *ngFor="let option of routeOptions; let i = index" [color]="i === selectedIndex ? 'success' : undefined"
+    (click)="selectRoute(i)" button="true">
     <ion-card-header>
       <ion-card-title>
-        {{ i === 0 ? '🏆 Percorso consigliato (minor consumo)' : 'Alternativa ' + i }}
+        Percorso {{ i + 1 }}
+        <ion-badge *ngIf="i === selectedIndex" color="success">Selezionato</ion-badge>
+        <ion-badge *ngIf="i === recommendedIndex" color="success">Minor consumo</ion-badge>
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
+      <div class="consumption-summary">
+        <span>Consumo previsto per il tragitto</span>
+        <strong>{{ option.estimatedConsumption | number:'1.2-2' }} {{ consumptionUnit }}</strong>
+      </div>
       <p><strong>Distanza:</strong> {{ option.distanceKm | number:'1.1-1' }} km</p>
+      <p><strong>Distanza equivalente per il consumo:</strong>
+        {{ option.effectiveDistanceKm | number:'1.1-1' }} km</p>
       <p><strong>Durata stimata:</strong> {{ option.durationMin | number:'1.0-0' }} min</p>
-      <p><strong>Dislivello positivo:</strong> {{ option.elevationGainM | number:'1.0-0' }} m</p>
-      <p><strong>Consumo stimato:</strong> {{ option.estimatedConsumption | number:'1.2-2' }} L/kg</p>
+      <p><strong>Salita totale:</strong> {{ option.elevationGainM | number:'1.0-0' }} m</p>
+      <p><strong>Discesa totale:</strong> {{ option.elevationLossM | number:'1.0-0' }} m</p>
+      <p><strong>Dislivello netto:</strong>
+        {{ option.netElevationM > 0 ? '+' : '' }}{{ option.netElevationM | number:'1.0-0' }} m</p>
     </ion-card-content>
   </ion-card>
 
   <p class="ion-padding" *ngIf="!routeOptions.length && !loading">
     Tocca la mappa per impostare partenza e arrivo. Verranno calcolati automaticamente
-    più percorsi alternativi e ti verrà mostrato quello a minor consumo stimato.
+    i percorsi alternativi realmente disponibili e ti verrà mostrato quello a minor consumo stimato.
   </p>
 </ion-content>
 
 <style>
+  .search-panel {
+    position: relative;
+    z-index: 2;
+    background: var(--ion-background-color);
+  }
+
+  .suggestions {
+    margin: 0 8px 8px;
+    border: 1px solid var(--ion-color-medium-tint);
+    border-top: 0;
+  }
+
+  .active-suggestion {
+    --background: var(--ion-color-light);
+    font-weight: 600;
+  }
+
+  .search-message {
+    padding: 6px 16px;
+    color: var(--ion-color-medium-shade);
+    font-size: 0.82rem;
+  }
+
   #map {
     width: 100%;
     height: 350px;
     z-index: 0;
+  }
+
+  .consumption-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .consumption-summary span {
+    font-size: 0.9rem;
+  }
+
+  .consumption-summary strong {
+    font-size: 1.35rem;
+    white-space: nowrap;
   }
 </style>

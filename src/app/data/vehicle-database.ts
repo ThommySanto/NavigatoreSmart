@@ -6,11 +6,15 @@ export interface VehicleModel {
   name: string;           // es. "Fiat Panda 1.2"
   fuelType: FuelType;
   avgConsumptionKmL: number; // km per litro (o kg per metano) in condizioni miste
+  massKg?: number;
+  drivetrainEfficiency?: number;
+  fuelEnergyKWhPerUnit?: number;
 }
 
 // Valori stimati/tipici (dati indicativi da schede tecniche medie, non ufficiali)
 export const VEHICLE_DATABASE: VehicleModel[] = [
   // Utilitarie
+  { id: 'ecoup-metano-2019', category: 'Utilitaria', name: 'Volkswagen eco up! Metano (2019)', fuelType: 'metano', avgConsumptionKmL: 27.8, massKg: 980, drivetrainEfficiency: 0.25, fuelEnergyKWhPerUnit: 13.9 },
   { id: 'panda-benzina', category: 'Utilitaria', name: 'Fiat Panda 1.2 Benzina', fuelType: 'benzina', avgConsumptionKmL: 16.5 },
   { id: 'panda-gpl', category: 'Utilitaria', name: 'Fiat Panda 1.2 GPL', fuelType: 'gpl', avgConsumptionKmL: 13.0 },
   { id: 'panda-metano', category: 'Utilitaria', name: 'Fiat Panda 0.9 Metano', fuelType: 'metano', avgConsumptionKmL: 15.0 },
@@ -18,6 +22,7 @@ export const VEHICLE_DATABASE: VehicleModel[] = [
   { id: 'yaris-ibrido', category: 'Utilitaria', name: 'Toyota Yaris Hybrid', fuelType: 'ibrido', avgConsumptionKmL: 22.0 },
 
   // Berline/Compatte
+  { id: 'polo-6-diesel-2010', category: 'Berlina', name: 'Volkswagen Polo 6 Diesel (2010)', fuelType: 'diesel', avgConsumptionKmL: 20.0, massKg: 1100, drivetrainEfficiency: 0.25, fuelEnergyKWhPerUnit: 9.8 },
   { id: 'golf-benzina', category: 'Berlina', name: 'VW Golf 1.5 TSI', fuelType: 'benzina', avgConsumptionKmL: 15.0 },
   { id: 'golf-diesel', category: 'Berlina', name: 'VW Golf 2.0 TDI', fuelType: 'diesel', avgConsumptionKmL: 19.5 },
   { id: 'octavia-gpl', category: 'Berlina', name: 'Skoda Octavia 1.5 TSI GPL', fuelType: 'gpl', avgConsumptionKmL: 11.5 },
