@@ -24,7 +24,10 @@ jobs:
       - name: Build Angular/Ionic web assets
         run: npm run build
 
-      - name: Add iOS platform assets (sync Capacitor)
+      - name: Add iOS platform (fresh, from scratch)
+        run: npx cap add ios
+
+      - name: Sync Capacitor (copy web build into iOS project)
         run: npx cap sync ios
 
       - name: Install CocoaPods dependencies
