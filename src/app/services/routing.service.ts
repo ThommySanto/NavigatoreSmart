@@ -15,6 +15,7 @@ export interface RouteOption {
   elevationGainM: number;  // salita totale
   elevationLossM: number;  // discesa totale
   netElevationM: number;   // quota arrivo - quota partenza
+  elevationAvailable: boolean;
   effectiveDistanceKm: number; // distanza equivalente con penalità salite
   estimatedConsumption: number; // litri/kg stimati per QUESTO veicolo
   score: number;           // punteggio combinato (più basso = migliore)
@@ -56,7 +57,8 @@ export class RoutingService {
       routes.push(...constrainedAlternatives);
     }
 
-    const options = await Promise.all(routes.map(async (route): Promise<RouteOption> => {
+    const options: RouteOption[] = [];
+    for (const route of routes) {
       const distanceKm = route.distance / 1000;
       const durationMin = route.duration / 60;
 
@@ -72,18 +74,19 @@ export class RoutingService {
         ? estimatedConsumption * vehicle.avgConsumptionKmL
         : distanceKm;
 
-      return {
+      options.push({
         geometry: route.geometry,
         distanceKm,
         durationMin,
         elevationGainM,
         elevationLossM: elevation.lossM,
         netElevationM: elevation.netM,
+        elevationAvailable: elevation.available,
         effectiveDistanceKm,
         estimatedConsumption,
         score: estimatedConsumption, // per ora il punteggio è il consumo stesso
-      };
-    }));
+      });
+    }
 
     // Mantiene i tre percorsi con il consumo stimato più basso.
     options.sort((a, b) => a.score - b.score);
@@ -167,8 +170,9 @@ export class RoutingService {
     gainM: number;
     lossM: number;
     netM: number;
+    available: boolean;
   }> {
-    if (coordinates.length < 2) return { gainM: 0, lossM: 0, netM: 0 };
+    if (coordinates.length < 2) return { gainM: 0, lossM: 0, netM: 0, available: false };
 
     // Campionamento fitto della geometria per non perdere salite brevi.
     // Open-Meteo accetta le coordinate in un'unica richiesta.
@@ -192,20 +196,9 @@ export class RoutingService {
         const chunk = sampled.slice(start, start + chunkSize);
         const latitudes = chunk.map(([, lat]) => lat).join(',');
         const longitudes = chunk.map(([lng]) => lng).join(',');
-        const url = `https://api.open-meteo.com/v1/elevation?latitude=${latitudes}&longitude=${longitudes}`;
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-
-        try {
-          const res = await fetch(url, { signal: controller.signal });
-          const data = await res.json();
-          if (!Array.isArray(data.elevation) || data.elevation.length !== chunk.length) {
-            return { gainM: 0, lossM: 0, netM: 0 };
-          }
-          elevations.push(...(start === 0 ? data.elevation : data.elevation.slice(1)));
-        } finally {
-          clearTimeout(timeout);
-        }
+        const chunkElevations = await this.fetchElevationChunk(latitudes, longitudes);
+        if (!chunkElevations) return { gainM: 0, lossM: 0, netM: 0, available: false };
+        elevations.push(...(start === 0 ? chunkElevations : chunkElevations.slice(1)));
       }
 
       let gain = 0;
@@ -219,10 +212,33 @@ export class RoutingService {
         gainM: gain,
         lossM: loss,
         netM: elevations[elevations.length - 1] - elevations[0],
+        available: true,
       };
     } catch (err) {
-      console.warn('Elevazione non disponibile, uso stima a dislivello zero:', err);
-      return { gainM: 0, lossM: 0, netM: 0 };
+      console.warn('Elevazione non disponibile per questo percorso:', err);
+      return { gainM: 0, lossM: 0, netM: 0, available: false };
     }
+  }
+
+  private async fetchElevationChunk(latitude: string, longitude: string): Promise<number[] | null> {
+    const url = `https://api.open-meteo.com/v1/elevation?latitude=${latitude}&longitude=${longitude}`;
+
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data.elevation)) return data.elevation;
+        }
+      } catch (error) {
+        if (attempt === 2) console.warn('Richiesta altimetrica fallita:', error);
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    return null;
   }
 }

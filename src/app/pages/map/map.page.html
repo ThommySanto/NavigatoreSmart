@@ -67,10 +67,15 @@
       <p><strong>Distanza equivalente per il consumo:</strong>
         {{ option.effectiveDistanceKm | number:'1.1-1' }} km</p>
       <p><strong>Durata stimata:</strong> {{ option.durationMin | number:'1.0-0' }} min</p>
-      <p><strong>Salita totale:</strong> {{ option.elevationGainM | number:'1.0-0' }} m</p>
-      <p><strong>Discesa totale:</strong> {{ option.elevationLossM | number:'1.0-0' }} m</p>
-      <p><strong>Dislivello netto:</strong>
-        {{ option.netElevationM > 0 ? '+' : '' }}{{ option.netElevationM | number:'1.0-0' }} m</p>
+      <ng-container *ngIf="option.elevationAvailable; else elevationUnavailable">
+        <p><strong>Salita totale:</strong> {{ option.elevationGainM | number:'1.0-0' }} m</p>
+        <p><strong>Discesa totale:</strong> {{ option.elevationLossM | number:'1.0-0' }} m</p>
+        <p><strong>Dislivello netto:</strong>
+          {{ option.netElevationM > 0 ? '+' : '' }}{{ option.netElevationM | number:'1.0-0' }} m</p>
+      </ng-container>
+      <ng-template #elevationUnavailable>
+        <p class="elevation-warning">Dati altimetrici temporaneamente non disponibili</p>
+      </ng-template>
     </ion-card-content>
   </ion-card>
 
