@@ -23,7 +23,9 @@ jobs:
 
       - name: Build Angular/Ionic web assets
         run: npm run build
-
+        
+      - name: Remove any existing iOS platform folder
+        run: rm -rf ios
       - name: Add iOS platform (fresh, from scratch)
         run: npx cap add ios
 
