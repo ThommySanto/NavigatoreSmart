@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar color="success">
+    <ion-title>EcoRoute — Il tuo veicolo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label>Tipo di carburante</ion-label>
+      <ion-select [(ngModel)]="selectedFuel" interface="action-sheet">
+        <ion-select-option *ngFor="let f of fuelTypes" [value]="f.value">
+          {{ f.label }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Consumo medio (km per litro/kg)</ion-label>
+      <ion-input type="number" [(ngModel)]="avgConsumption"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="success" class="ion-margin-top" (click)="save()">
+    Continua alla mappa
+  </ion-button>
+</ion-content>

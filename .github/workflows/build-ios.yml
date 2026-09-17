@@ -1,0 +1,62 @@
+name: Build iOS IPA (unsigned)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Angular/Ionic web assets
+        run: npm run build
+
+      - name: Add iOS platform assets (sync Capacitor)
+        run: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios/App
+        run: pod install
+
+      - name: Build unsigned .app (Release, simulator-independent)
+        working-directory: ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE=""
+
+      - name: Package as unsigned IPA
+        working-directory: ios/App/build/Build/Products/Release-iphoneos
+        run: |
+          mkdir -p Payload
+          cp -r App.app Payload/
+          zip -r EcoRoute-unsigned.ipa Payload
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcoRoute-unsigned-ipa
+          path: ios/App/build/Build/Products/Release-iphoneos/EcoRoute-unsigned.ipa
+
+# NOTA: questo IPA non è firmato. Usa iLoader (o AltStore/Sideloadly) sul tuo
+# dispositivo per firmarlo con il tuo Apple ID gratuito (certificato valido 7 giorni)
+# e installarlo. Dovrai ripetere l'installazione ogni 7 giorni.

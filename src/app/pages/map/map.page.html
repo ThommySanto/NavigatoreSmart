@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="success">
+    <ion-title>EcoRoute — Percorso</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="resetRoute()">Reset</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div id="map" style="width: 100%; height: 70%;"></div>
+
+  <ion-card *ngIf="distanceKm">
+    <ion-card-header>
+      <ion-card-title>Dettagli percorso</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Distanza:</strong> {{ distanceKm | number:'1.1-1' }} km</p>
+      <p *ngIf="estimatedConsumption">
+        <strong>Consumo stimato:</strong> {{ estimatedConsumption | number:'1.1-2' }} L/kg
+      </p>
+      <p *ngIf="!estimatedConsumption">
+        Imposta i dati del veicolo per vedere il consumo stimato.
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <p class="ion-padding" *ngIf="!distanceKm">
+    Tocca la mappa per impostare partenza e arrivo.
+  </p>
+</ion-content>
