@@ -5,7 +5,7 @@ import {
   IonHeader, IonToolbar, IonTitle, IonContent,
   IonList, IonItem, IonLabel, IonSelect, IonSelectOption,
   IonInput, IonButton
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { Router } from '@angular/router';
 import { VehicleService, FuelType } from '../../services/vehicle.service';
 

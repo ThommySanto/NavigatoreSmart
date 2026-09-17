@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import {
   IonHeader, IonToolbar, IonTitle, IonButtons, IonButton,
   IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import * as L from 'leaflet';
 import { VehicleService } from '../../services/vehicle.service';
 
