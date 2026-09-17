@@ -23,11 +23,18 @@ jobs:
 
       - name: Build Angular/Ionic web assets
         run: npm run build
-        
+
       - name: Remove any existing iOS platform folder
         run: rm -rf ios
+
+      - name: Ensure @capacitor/ios is installed
+        run: npm install @capacitor/ios
+
       - name: Add iOS platform (fresh, from scratch)
         run: npx cap add ios
+
+      - name: Debug - list ios/App contents
+        run: ls -la ios/App || echo "ios/App NON esiste"
 
       - name: Sync Capacitor (copy web build into iOS project)
         run: npx cap sync ios
